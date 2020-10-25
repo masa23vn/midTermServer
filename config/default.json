@@ -1,0 +1,21 @@
+{
+    "mysql": {
+        "connectionLimit": 50,
+        "host": "localhost",
+        "port": 3306,
+        "user": "root",
+        "password": "root",
+        "database": "midtermdb"
+    },
+    "mysqlHost": {
+      "connectionLimit": 10,
+      "host": "remotemysql.com",
+      "port": 3306,
+      "user": "Q1shnZHMFJ",
+      "password": "4qAgw3mD76",
+      "database": "Q1shnZHMFJ"
+  },
+    "paginate": {
+      "limit": 6
+    }
+  }

@@ -1,16 +1,15 @@
-var express = require("express");
-const { route } = require(".");
-var router = express.Router();
+const express = require("express");
+require('express-async-errors');
 
-const data = [
-    {name: "name1", description: "des1"}, 
-    {name: "name2", description: "des2"},
-    {name: "name3", description: "des3"}, 
-    {name: "name4", description: "des4"}];
+const router = express.Router();
+const model = require('../utils/sql_command');
 
-const data1 = ["name1", "name2", "name3", "name4"];
-    
-router.get("/", function(req, res, next) {
+router.get("/", async(req, res) => {
+
+    const [data] = await Promise.all([
+        model.getAllBoard(),
+    ]);
+    console.log(data);
     res.send(data);
 });
 
