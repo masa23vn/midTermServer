@@ -19,9 +19,10 @@ app.set('view engine', 'jade');
 // dependency
 var corsOptions = {
   //origin: "http://localhost:3000"
-  origin: "https://midterm596.herokuapp.com/"
+  origin: /midterm596.herokuapp\.com$/,
 };
 app.use(cors(corsOptions));
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(bodyParser.json());
