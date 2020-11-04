@@ -2,7 +2,11 @@ const mysql = require("mysql");
 const util = require("util");
 const config = require('../config/default.json');
 
+
+// CHANGE DATABASE HERE
 const pool = mysql.createPool(config.mysqlHost);
+////////////////////////////////////////////////////
+
 
 const mysql_query = util.promisify(pool.query).bind(pool);
 
@@ -11,7 +15,7 @@ module.exports = {
     loadSafe: (sql_string, entity) => mysql_query(sql_string, entity),
 
     add: (tableName, entity) => mysql_query(`insert into ${tableName} set ?`, entity),
-    delete: (sql_string, entity) => mysql_query(sql_string, entity),
+    delete: (tableName, condition) => mysql_query(`delete from ${tableName} where ?`, [condition]),
 
     patch: (tableName, entity, condition) => mysql_query(`update ${tableName} set ? where ?`, [entity, condition]),
 };
