@@ -21,13 +21,7 @@ const corsOptions = {
 };
 */
 const corsOptions = {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
-    credentials: true
-
-  }
+    origin: '*:*',
 };
 
 const app = express();
