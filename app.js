@@ -21,16 +21,8 @@ const corsOptions = {
 };
 */
 const corsOptions = {
-  handlePreflightRequest: (req, res) => {
-      const headers = {
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
-          "Access-Control-Allow-Origin": /midterm596.herokuapp\.com$/,
-          "Access-Control-Allow-Credentials": true
-      };
-      res.writeHead(200, headers);
-      res.end();
-  }
-}
+  origins:'midterm596.herokuapp.com:* http://midterm596.herokuapp.com:* http://www.midterm596.herokuapp.com:*',
+};
 
 const app = express();
 const server = http.createServer(app);
