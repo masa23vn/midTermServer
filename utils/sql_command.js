@@ -1,41 +1,45 @@
 const db = require("./database");
 
 module.exports = {
-    getBoardByUser: (ID) =>
-        db.loadSafe(`SELECT *
-                FROM board
-                WHERE idUser = ? `, [ID]),
+    getBoardByUser: (userID) =>
+        db.loadSafe(`SELECT b.ID, b.name
+                FROM board as b
+                WHERE b.idUser = ?
+                ORDER BY b.dateCreate ASC`, [userID]),
 
-    getBoardByID: (boardID, userID) =>
+    getBoardByID: (boardID) =>
         db.loadSafe(`SELECT b.*
-                FROM board as b JOIN user as u ON b.idUser = u.ID
-                WHERE b.ID = ? AND u.ID = ?`, [boardID, userID]),
+                FROM board as b
+                WHERE b.ID = ?`, [boardID]),
 
-    getAllColumnByBoardID: (boardID, userID) =>
+    getAllColumnByBoardID: (boardID) =>
         db.loadSafe(`SELECT c.*
                 FROM columnboard as c JOIN board as b ON c.idBoard = b.ID
-                                    JOIN user as u ON b.idUser = u.ID
-                WHERE c.idBoard = ? AND u.ID = ?`, [boardID, userID]),
+                WHERE c.idBoard = ?`, [boardID]),
 
-    getColumnByID: (columnID, boardID, userID) =>
+    getColumnByID: (columnID, boardID) =>
         db.loadSafe(`SELECT c.*
                     FROM columnboard as c JOIN board as b ON c.idBoard = b.ID
-                                        JOIN user as u ON b.idUser = u.ID
-                    WHERE c.ID = ? AND c.idBoard = ? AND u.ID = ?`, [columnID, boardID, userID]),
+                    WHERE c.ID = ? AND c.idBoard = ?`, [columnID, boardID]),
 
-    getAllCardByColumnID: (columnID, boardID, userID) =>
+    getAllCardByBoardID: (boardID) =>
         db.loadSafe(`SELECT ca.*
                     FROM card as ca JOIN columnboard as c ON ca.idColumnBoard = c.ID
                                         JOIN board as b ON c.idBoard = b.ID
-                                        JOIN user as u ON b.idUser = u.ID
-                    WHERE c.ID = ? AND c.idBoard = ? AND u.ID = ?`, [columnID, boardID, userID]),
+                    WHERE c.idBoard = ?
+                    ORDER BY ca.pos ASC`, [boardID]),
 
-    getCardByID: (cardID, columnID, boardID, userID) =>
+    getMaxPosByIDColumn: (columnID, boardID) =>
+        db.loadSafe(`SELECT MAX(ca.pos) as max
+                    FROM card as ca JOIN columnboard as c ON ca.idColumnBoard = c.ID
+                                        JOIN board as b ON c.idBoard = b.ID
+                    WHERE c.ID = ? AND c.idBoard = ?`, [columnID, boardID]),
+
+    getCardByID: (cardID, columnID, boardID) =>
         db.loadSafe(`SELECT ca.*
                     FROM card as ca JOIN columnboard as c ON ca.idColumnBoard = c.ID
                                         JOIN board as b ON c.idBoard = b.ID
-                                        JOIN user as u ON b.idUser = u.ID
-                    WHERE ca.ID = ? AND c.ID = ? AND c.idBoard = ? AND u.ID = ?`, [cardID, columnID, boardID, userID]),
+                    WHERE ca.ID = ? AND c.ID = ? AND c.idBoard = ?`, [cardID, columnID, boardID]),
 
 
     getUserByID: (ID) =>
@@ -80,9 +84,10 @@ module.exports = {
         return db.add(`user`, newUser)
     },
 
-    createBoard: ([name, ID]) => {
+    createBoard: ([boardID, name, ID]) => {
         const dateCreate = new Date();
         const newBoard = {
+            ID: boardID,
             name: name,
             description: null,
             dateCreate: dateCreate,
@@ -117,14 +122,14 @@ module.exports = {
         return db.delete(`columnboard`, condition);
     },
 
-    createCard: ([des, idColumn, idUser]) => {
-        const dateCreate = new Date();
+    createCard: ([des, date, idColumn, idUser, pos]) => {
         const newCard = {
             description: des,
-            dateCreate: dateCreate,
+            dateCreate: date,
             status: 1,
             idColumnBoard: idColumn,
-            idUser: idUser
+            idUser: idUser,
+            pos: pos
         }
         return db.add(`card`, newCard)
     },
@@ -138,5 +143,23 @@ module.exports = {
         delete entity.ID;
         return db.patch(`card`, entity, condition);
     },
+
+    editCardPos: (pos, cardID) =>
+        db.loadSafe(`UPDATE card
+                SET pos = ?
+                WHERE ID = ?`, [pos, cardID]),
+
+
+    moveCardUp: (from, to, columnID) =>
+        db.loadSafe(`UPDATE card
+                    SET pos = (pos - 1)
+                    WHERE pos > ? AND pos <= ?
+                    AND idColumnBoard = ?`, [from, to, columnID]),
+
+    moveCardDown: (from, to, columnID) =>
+        db.loadSafe(`UPDATE card
+                    SET pos = (pos + 1)
+                    WHERE pos >= ? AND pos < ?
+                    AND idColumnBoard = ?`, [from, to, columnID]),
 
 };

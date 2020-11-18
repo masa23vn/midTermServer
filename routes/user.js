@@ -4,6 +4,7 @@ require('express-async-errors');
 const router = express.Router();
 const model = require('../utils/sql_command');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 
 /* GET users listing. */
@@ -12,7 +13,7 @@ router.get('/', async (req, res) => {
   res.send(user);
 });
 
-router.post('/changeinfo', async (req, res) => {
+router.post('/changeinfo/', async (req, res) => {
   const user = req.user.user[0];
   const input = req.user.input;
   // check same gmail
@@ -43,7 +44,7 @@ router.post('/changeinfo', async (req, res) => {
   res.sendStatus(200)
 });
 
-router.post('/changepass', async (req, res) => {
+router.post('/changepass/', async (req, res) => {
   const user = req.user.user[0];
   const input = req.user.input;
   // check same old password
@@ -60,5 +61,35 @@ router.post('/changepass', async (req, res) => {
   }
 });
 
+// list of board
+router.get("/board/", async (req, res) => {
+  data = await model.getBoardByUser(req.user.user[0].ID);
+  res.send(data);
+});
+
+router.post("/board/create/", async (req, res) => {
+  const user = req.user.user[0];
+  const input = req.user.input;
+
+  const boardID = uuidv4();
+  await model.createBoard([boardID, input.name, user.ID]);
+
+  await model.createColumn(["Went well", boardID]);
+  await model.createColumn(["To improve", boardID]);
+  await model.createColumn(["Action items", boardID]);
+  res.status(200).send({
+    ID: boardID,
+  });
+
+});
+
+router.post("/board/delete/", async (req, res) => {
+  const input = req.user.input;
+  await Promise.all([
+    model.deleteColumn(input.ID),
+    model.deleteBoard(input.ID),
+  ]);
+  res.sendStatus(200);
+});
 
 module.exports = router;

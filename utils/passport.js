@@ -6,16 +6,20 @@ const bcrypt = require('bcrypt');
 
 const JWTStrategy = passportJWT.Strategy;
 const LocalStrategy = require('passport-local').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const model = require('./sql_command');
 
 passport.use(new LocalStrategy(
     async (username, password, done) => {
-        const user = await model.getUserByUsername(username)
-        const res = bcrypt.compareSync(password, user[0].password);
-        if (!res) {
-            return done(null, false, { message: 'Incorrect username or password.' });
+        const user = await model.getUserByUsername(username);
+        if (user && user !== undefined && user.length != 0) {
+            const res = bcrypt.compareSync(password, user[0].password);
+            if (res) {
+                return done(null, user, { message: 'Logged In Successfully' });
+            }
         }
-        return done(null, user, { message: 'Logged In Successfully' });
+        return done(null, false, { message: 'Incorrect username or password.' });
+
     })
 );
 
@@ -55,3 +59,28 @@ passport.use(new JWTStrategy({
     }
 ));
 
+/*
+passport.use(new FacebookStrategy({
+    clientID: "277390883700241",
+    clientSecret: "844a3603b0e8afbf495b3833978dd83e",
+    callbackURL: "http://localhost:9000/auth/facebook/callback",
+    profileFields: ['id', 'displayName', 'email'],
+    passReqToCallback: true,  
+  },
+  async (req, accessToken, refreshToken, profile, done) => {
+    console.log(profile.emails);  
+    
+    const username = profile.username;
+    const email = profile.email;
+    const fullname = profile.fullname;
+    const user = await model.getUserByNameOrEmail({ username: username, email: email })
+    if (user && user !== undefined && user.length != 0) {
+        return done(null, false, { message: 'That email or username is already taken.' });
+    }
+    await model.register([username, accessToken + "/" + refreshToken, email, fullname]);
+    const newUser = await model.getUserByEmail(email);
+    
+    return done(null, profile);
+  }
+));
+*/
