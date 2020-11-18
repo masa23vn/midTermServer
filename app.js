@@ -22,7 +22,7 @@ const corsOptions = {
 */
 const corsOptions = {
   cors: {
-    origin: /midterm596.herokuapp\.com$/,
+    origin: "*",
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
@@ -42,7 +42,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // dependency
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(logger('dev'));
 app.use(express.json());
