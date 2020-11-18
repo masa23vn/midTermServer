@@ -37,7 +37,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // dependency
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -72,7 +72,7 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-server.listen(9000, () => {
+server.listen(process.env.PORT || 9000, () => {
   console.log("server running at port 9000");
 });
 
