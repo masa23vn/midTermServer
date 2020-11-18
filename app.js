@@ -15,7 +15,8 @@ const corsOptions = {
   cors:true,
   // test
   //origin: "http://localhost:3000"
-  origin: /midterm596.herokuapp\.com$/,
+  //origin: /midterm596.herokuapp\.com$/,
+  origin: "https://midterm596.herokuapp.com/"
 };
 
 const app = express();
