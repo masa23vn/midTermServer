@@ -12,6 +12,7 @@ require('express-async-errors');
 require('./utils/passport');
 
 const corsOptions = {
+  cors:true,
   // test
   //origin: "http://localhost:3000"
   origin: /midterm596.herokuapp\.com$/,
@@ -19,12 +20,7 @@ const corsOptions = {
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server, {
-  cors: {
-    //origin: "http://localhost:3000",
-    origin: /midterm596.herokuapp\.com$/,
-  }
-});
+const io = socketIO(server, corsOptions);
 
 const ioConfig = require('./utils/server')(io);
 
